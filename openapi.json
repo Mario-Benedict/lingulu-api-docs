@@ -1,0 +1,785 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "User Account Management API",
+    "version": "1.0.0",
+    "description": "API for managing user accounts including registration, login, profile management, and password handling."
+  },
+  "servers": [
+    {
+      "url": "https://api.lingulu.com"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Account Management",
+      "description": "Endpoints for user account operations"
+    }
+  ],
+  "paths": {
+    "/account/register": {
+      "post": {
+        "summary": "Register a new user account",
+        "tags": ["Account Management"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "format": "password" },
+                  "confirm_password": { "type": "string", "format": "password" }
+                },
+                "required": [
+                  "username",
+                  "email",
+                  "password",
+                  "confirm_password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "username": { "type": "string" },
+                    "email": { "type": "string", "format": "email" }
+                  }
+                }
+              }
+            }
+          },
+
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "username": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "description": "Error message related to the username field"
+                          },
+                          "examples": [
+                            [
+                              "username already taken",
+                              "username must be at least 3 characters"
+                            ]
+                          ]
+                        },
+                        "email": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "description": "Error message related to the email field"
+                          },
+                          "examples": [
+                            ["invalid email format", "email already in use"]
+                          ]
+                        },
+                        "password": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "description": "Error message related to the password field"
+                          },
+                          "examples": [
+                            [
+                              "password too weak",
+                              "password must contain at least one number"
+                            ]
+                          ]
+                        },
+                        "confirm_password": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "description": "Error message related to the confirm_password field"
+                          },
+                          "examples": [["passwords do not match"]]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/login": {
+      "post": {
+        "summary": "Log in to an existing user account",
+        "tags": ["Account Management"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "password": { "type": "string", "format": "password" }
+                },
+                "required": ["username", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string" },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "username": { "type": "string" },
+                        "email": { "type": "string", "format": "email" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+
+          "401": {
+            "description": "Invalid username or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid username or password"
+                    }
+                  }
+                }
+              }
+            }
+          },
+
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/logout": {
+      "post": {
+        "summary": "Log out from the user account",
+        "tags": ["Account Management"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string" }
+                },
+                "required": ["token"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Logout successful"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/profile": {
+      "get": {
+        "summary": "Retrieve user profile information",
+        "tags": ["Account Management"],
+        "description": "Retrieve authenticated user's profile using the provided authorization token.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "username": { "type": "string" },
+                    "email": { "type": "string", "format": "email" },
+                    "name": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "User not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/profile/update": {
+      "put": {
+        "summary": "Update user profile information",
+        "tags": ["Account Management"],
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "name": { "type": "string" }
+                },
+                "required": ["email", "name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "username": { "type": "string" },
+                    "email": { "type": "string", "format": "email" },
+                    "name": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "email": {
+                          "type": "array",
+                          "items": { "type": "string" },
+                          "examples": [
+                            ["invalid email format", "email already in use"]
+                          ]
+                        },
+                        "name": {
+                          "type": "array",
+                          "items": { "type": "string" },
+                          "examples": [["name cannot be empty"]]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/delete": {
+      "delete": {
+        "summary": "Delete user account",
+        "description": "Deletes the authenticated user's account. Requires a valid Authorization token.",
+        "tags": ["Account Management"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User account has been deleted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid or missing token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "User does not exist"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/change-password": {
+      "post": {
+        "summary": "Change user account password",
+        "description": "Allows an authenticated user to change their account password.",
+        "tags": ["Account Management"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "old_password": { "type": "string", "format": "password" },
+                  "new_password": { "type": "string", "format": "password" }
+                },
+                "required": ["old_password", "new_password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Password has been updated"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "new_password": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": ["password too weak"]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - old password is incorrect",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Old password is incorrect"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/reset-password": {
+      "post": {
+        "summary": "Request password reset",
+        "description": "Send password reset instructions to the user's email address.",
+        "tags": ["Account Management"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset instructions sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Password reset instructions have been sent to your email"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "email": {
+                          "type": "array",
+                          "items": { "type": "string" },
+                          "example": [
+                            "User with the given email does not exist"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/verify-email": {
+      "post": {
+        "summary": "Verify user email address",
+        "description": "Verify a user's email using the verification code sent to their email.",
+        "tags": ["Account Management"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "verification_code": { "type": "string" }
+                },
+                "required": ["id", "verification_code"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email has been verified"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired verification code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "verification_code": {
+                          "type": "array",
+                          "items": { "type": "string" },
+                          "example": [
+                            "The provided verification code is incorrect or expired"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "array",
+                          "items": { "type": "string" },
+                          "example": ["User with the given ID does not exist"]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
