@@ -1,13 +1,13 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
     {
-      "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/openapi.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" }
+      ]
     }
   ]
 }
