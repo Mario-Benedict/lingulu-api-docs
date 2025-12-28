@@ -17,7 +17,7 @@
     }
   ],
   "paths": {
-    "/account/register": {
+    "/api/account/register": {
       "post": {
         "summary": "Register a new user account",
         "tags": ["Account Management"],
@@ -139,7 +139,73 @@
         }
       }
     },
-    "/account/login": {
+    "/api/account/oauth2/data": {
+      "post": {
+        "summary": "Request user data for the user login with google",
+        "tags": ["Account Management"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": { "type": "string" }
+                },
+                "required": ["token"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "accessToken": { "type": "string" },
+                    "email": { "type": "string", "format": "email" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Invalid token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/login": {
       "post": {
         "summary": "Log in to an existing user account",
         "tags": ["Account Management"],
@@ -214,7 +280,7 @@
         }
       }
     },
-    "/account/logout": {
+    "/api/account/logout": {
       "post": {
         "summary": "Log out from the user account",
         "tags": ["Account Management"],
@@ -265,7 +331,7 @@
         }
       }
     },
-    "/account/profile": {
+    "/api/account/profile": {
       "get": {
         "summary": "Retrieve user profile information",
         "tags": ["Account Management"],
@@ -326,7 +392,7 @@
         }
       }
     },
-    "/account/profile/update": {
+    "/api/account/profile/update": {
       "put": {
         "summary": "Update user profile information",
         "tags": ["Account Management"],
@@ -421,7 +487,7 @@
         }
       }
     },
-    "/account/delete": {
+    "/api/account/delete": {
       "delete": {
         "summary": "Delete user account",
         "description": "Deletes the authenticated user's account. Requires a valid Authorization token.",
@@ -499,7 +565,7 @@
         }
       }
     },
-    "/account/change-password": {
+    "/api/account/change-password": {
       "post": {
         "summary": "Change user account password",
         "description": "Allows an authenticated user to change their account password.",
@@ -600,7 +666,7 @@
         }
       }
     },
-    "/account/reset-password": {
+    "/api/account/reset-password": {
       "post": {
         "summary": "Request password reset",
         "description": "Send password reset instructions to the user's email address.",
@@ -679,7 +745,7 @@
         }
       }
     },
-    "/account/verify-email": {
+    "/api/account/verify-email": {
       "post": {
         "summary": "Verify user email address",
         "description": "Verify a user's email using the verification code sent to their email.",
@@ -773,6 +839,199 @@
                       "type": "string",
                       "example": "Internal server error"
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/otp/request": {
+      "post": {
+        "summary": "Request a One-Time Password (OTP)",
+        "tags": ["Account Management"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" }
+                },
+                "required": ["email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "OTP has been sent to your email"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "User with the given email does not exist"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/otp/verify": {
+      "post": {
+        "summary": "Verify a One-Time Password (OTP)",
+        "tags": ["Account Management"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "otp": { "type": "string" }
+                },
+                "required": ["email", "otp"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "OTP has been verified"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired OTP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "The provided OTP is incorrect or expired"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/conversation": {
+      "post": {
+        "summary": "Create a new conversation",
+        "tags": ["Account Management"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": { "type": "string" }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI reply successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "conversationId": { "type": "string" },
+                    "message": {
+                      "type": "string",
+                      "example": "Conversation created successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" }
                   }
                 }
               }
