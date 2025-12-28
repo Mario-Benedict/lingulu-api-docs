@@ -999,9 +999,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "message": { "type": "string" }
+                  "audio" : { "type": "string", "format": "binary" },
+                  "conversationId": { "type": "string" }
                 },
-                "required": ["message"]
+                "required": ["audio", "conversationId"]
               }
             }
           }
